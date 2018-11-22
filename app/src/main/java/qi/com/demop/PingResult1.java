@@ -60,8 +60,7 @@ public class PingResult1 extends AppCompatActivity{
     // Myhandler handler=null;
     Handler handler1 = null;
     Thread a = null;
-    private Button btn_send;
-    private String t;
+
     private String query;
     private String min;
     private String max;
@@ -74,14 +73,31 @@ public class PingResult1 extends AppCompatActivity{
     private String maxss;
     private SimpleDateFormat formatter;
     private Date curDate;
-    private String str;
+    private String str,wf;
+    private int Time=4;
+    private Handler handler=new Handler(){
+        public void handleMessage(android.os.Message msg) {
+            if (msg.what==0) {
+                if (Time>0) {
+                    //时间--
+                    Time--; //给时间赋值
+
+
+                    handler.sendEmptyMessageDelayed(0, 1000);
+                }else {
+                    finish();
+
+                }
+            }
+        };
+    };
+    private String[] maxsss;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ping_result1);
         tv_show = (TextView) findViewById(R.id.tv_show);
-
-
         Intent intent2 = this.getIntent();
         Bundle bundle2 = intent2.getExtras();
         ping = bundle2.getString("ping");
@@ -89,7 +105,6 @@ public class PingResult1 extends AppCompatActivity{
         count = bundle2.getString("count");
         time = bundle2.getString("time");
         size = bundle2.getString("size");
-        t = bundle2.getString("t");
         city = bundle2.getString("city");
         regionName = bundle2.getString("regionName");
         org = bundle2.getString("org");
@@ -248,45 +263,28 @@ public class PingResult1 extends AppCompatActivity{
                             // Log.i("qq",lineStr+"");
                             int i = lineStr.indexOf("received");
                             int j = lineStr.indexOf("%");
-
-
-
-                            //Log.i("aa","====丢包率====:" + lineStr.substring(i + 10, j + 1));
-                            lost = lineStr.substring(i + 10, j + 1);
-
-
-                            /*String ddddd=lost;
-
-                            losts=ddddd.substring(str.indexOf("%"));*/
-
+                            lost = lineStr.substring(i + 10, j + 1).toString().replaceAll("%","");
 
                         }
                         if (lineStr.contains("avg")) {
                             int i = lineStr.indexOf("/", 20);
                             int j = lineStr.indexOf(".", i);
-
                             String substring = lineStr.substring(i + 1, j);
-
                             delay = lineStr.substring(i + 1, j + 4);
-                            min = lineStr.substring(i - 10, j - 3);
+                            min = lineStr.substring(i - 7, j - 4).toString().replaceAll("=","");
                             mins = String.valueOf(min);
-                            String dddd=mins;
-
-                            minss=dddd.substring(4);
-
-
-
-                            max = lineStr.substring(i + 8, j + 11);
+                            max = lineStr.substring(i + 8, j + 10).toString().replaceAll("/","");
                             maxs = String.valueOf(max);
-
-                            //Log.i("bbbbb",cc+"");
-                            Log.i("cccc", delay + "");
-
-
                             delay = delay + "ms";
                             formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             curDate = new Date(System.currentTimeMillis());
                             str = formatter.format(curDate);
+                            boolean wifi = NetWorkUtils.isWifi(PingResult1.this);
+                            if (wifi==false){
+                                wf = "L";
+                            }else {
+                                wf="W";
+                            }
                             new Thread()
                             {
                                 @Override
@@ -305,10 +303,13 @@ public class PingResult1 extends AppCompatActivity{
                                         ClientKey.put("query", query);
                                         ClientKey.put("org", org);
                                         ClientKey.put("dst", ip);
-                                        ClientKey.put("min",minss);
+                                        Log.i("yes",ip+"");
+                                        ClientKey.put("min",mins);
                                         ClientKey.put("max", maxs);
-                                        ClientKey.put("loss", "0");
+                                        ClientKey.put("loss", lost);
                                         ClientKey.put("date", str);
+                                        ClientKey.put("terminalType","MA");
+                                        ClientKey.put("networkType",wf);
                                         /*封装Person数组*/
                     /*JSONObject params = new JSONObject();
                     params.put("Person", ClientKey);*/
@@ -330,8 +331,8 @@ public class PingResult1 extends AppCompatActivity{
                                         if(code == 200)
                                         {
                                             Toast.makeText(PingResult1.this,"数据成功发送",Toast.LENGTH_LONG).show();
-                                            sleep(9000);
-                                            finish();
+                                            //sleep(4000);
+                                            handler.sendEmptyMessage(0);
 
                                         }
 

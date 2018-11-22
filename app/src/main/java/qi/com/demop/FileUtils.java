@@ -81,11 +81,6 @@ public class FileUtils {
         try {
             file=new File(path, fileName);
             fos=new FileOutputStream(file);
-
-//			fos.write(str.getBytes());
-//			fos.write("\r\n".getBytes());
-//			fos.write("I am lilu".getBytes());
-//			fos.close();
             PrintWriter pw=new PrintWriter(fos,true);
             pw.println(str);;
             pw.close();

@@ -4,93 +4,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.telephony.mbms.MbmsErrors;
+import android.os.SystemClock;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Button btn_ping;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+public class MainActivity extends AppCompatActivity{
     EditText et_ip, et_count, et_size, et_time;
     String ip, count, size, time;
-    String ip2,hip2,hip1,qip2,qip1,ship3,ship2,ship1,sip3,sip2,sip1,ynip;
     private String query;
-    private Intent intent1;
-    private EditText edit_ip2;
-    private Button btn_ping2;
-    private Button sbtn_ping1;
-    private Button sbtn_ping2;
-    private Button sbtn_ping3;
-    private Button qbtn_ping1;
-    private Button qbtn_ping2;
-    private Button shbtn_ping1;
-    private Button shbtn_ping2;
-    private Button shbtn_ping3;
-    private Button hbtn_ping1;
-    private Button hbtn_ping2;
-    private EditText sedit_ip1;
-    private EditText sedit_ip2;
-    private EditText sedit_ip3;
-    private EditText shedit_ip1;
-    private EditText shedit_ip2;
-    private EditText shedit_ip3;
-    private EditText qedit_ip1;
-    private EditText qedit_ip2;
-    private EditText hedit_ip1;
-    private EditText hedit_ip2;
-    private Button ynbtn_ping;
-    private EditText ynedit_ip;
     private String city;
     private String regionName;
     private String org;
-    private int Time=60;
-    private Handler handler=new Handler(){
-        public void handleMessage(android.os.Message msg) {
-            if (msg.what==0) {
-                if (Time>0) {
-                    //时间--
-                 Time--; //给时间赋值
-
-                 handler.sendEmptyMessageDelayed(0, 1000);
-                }else {
-
-                    Intent intent=new Intent(MainActivity.this,PingResult1.class);
-                    startActivity(intent); finish();
-                }
-            }
-        };
-    };
-
-
+    private boolean isFirst = true;
+    private SharedPreferences pref;
+    private Timer timer1;
+    private int cc=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
 
-        btn_ping.setOnClickListener(this);
-        btn_ping2.setOnClickListener(this);
-        sbtn_ping1.setOnClickListener(this);
-        sbtn_ping2.setOnClickListener(this);
-        sbtn_ping3.setOnClickListener(this);
-        shbtn_ping1.setOnClickListener(this);
-        shbtn_ping2.setOnClickListener(this);
-        shbtn_ping3.setOnClickListener(this);
-        qbtn_ping1.setOnClickListener(this);
-        qbtn_ping2.setOnClickListener(this);
-        hbtn_ping1.setOnClickListener(this);
-        hbtn_ping2.setOnClickListener(this);
-        ynbtn_ping.setOnClickListener(this);
+        init();
+        pref = getSharedPreferences("isFirst", MODE_PRIVATE);//创建SharedPreferences对象
+        isFirst = pref.getBoolean("isFirstIn", true);
         try {
             RetrofitUtils.getInstance().getMyServer().ping()
                     .subscribeOn(Schedulers.io())
@@ -124,413 +68,123 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+        timer1 = new Timer();
+        TimerTask task=new TimerTask() {
+            @Override
+            public void run() {
+                List<String> list=new ArrayList<>();
+                list.add("39.106.143.106");
+                list.add("59.110.167.178");
+                list.add("39.108.229.16");
+                list.add("120.78.64.248");
+                list.add("120.78.68.95");
+                list.add("47.104.100.41");
+                list.add("47.104.131.23");
+                list.add("106.14.141.68");
+                list.add("47.100.186.29");
+                list.add("106.15.207.66");
+                list.add("39.104.202.19");
+                list.add("39.104.228.146");
+                list.add("149.129.242.146");
 
+                for (int i = 0; i <list.size() ; i++) {
+                    Log.i("yes",list.get(i));
+                    //ip = et_ip.getText().toString();
+                    count = et_count.getText().toString();
+                    size = et_size.getText().toString();
+                    time = et_time.getText().toString();
 
+                    String countCmd = " -c " + count + " ";
+                    String sizeCmd = " -s " + size + " ";
+                    String timeCmd = " -i " + time + " ";
+                    String ip_adress = list.get(i);
+                    String ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
 
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, PingResult1.class);
+                    // new一个Bundle对象，并将要传递的数据传入
+                    Bundle bundle = new Bundle();
+                    bundle.putString("ping", ping);
+                    bundle.putString("ip", list.get(i));
+                    bundle.putString("city",city);
+                    bundle.putString("regionName",regionName);
+                    bundle.putString("org",org);
+                    bundle.putString("count", count);
+                    bundle.putString("size", size);
+                    bundle.putString("time", time);
+                    bundle.putString("query",query);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            }
+
+        };
+        timer1.schedule(task,4000);
     }
 
     private void init() {
-        btn_ping = (Button) findViewById(R.id.btn_ping);
         et_ip = (EditText) findViewById(R.id.edit_ip);
         et_count = (EditText) findViewById(R.id.edit_count);
         et_size = (EditText) findViewById(R.id.edit_size);
         et_time = (EditText) findViewById(R.id.edit_time);
-        edit_ip2 = findViewById(R.id.edit_ip2);
-        btn_ping2 = findViewById(R.id.btn_ping2);
-        sbtn_ping1 = findViewById(R.id.sbtn_ping1);
-        sbtn_ping2 = findViewById(R.id.sbtn_ping2);
-        sbtn_ping3 = findViewById(R.id.sbtn_ping3);
-        qbtn_ping1 = findViewById(R.id.qbtn_ping1);
-        qbtn_ping2 = findViewById(R.id.qbtn_ping2);
-        shbtn_ping1 = findViewById(R.id.shbtn_ping1);
-        shbtn_ping2 = findViewById(R.id.shbtn_ping2);
-        shbtn_ping3 = findViewById(R.id.shbtn_ping3);
-        hbtn_ping1 = findViewById(R.id.hbtn_ping1);
-        hbtn_ping2 = findViewById(R.id.hbtn_ping2);
-        sedit_ip1 = findViewById(R.id.sedit_ip1);
-        sedit_ip2 = findViewById(R.id.sedit_ip2);
-        sedit_ip3 = findViewById(R.id.sedit_ip3);
-        shedit_ip1 = findViewById(R.id.shedit_ip1);
-        shedit_ip2 = findViewById(R.id.shedit_ip2);
-        shedit_ip3 = findViewById(R.id.shedit_ip3);
-        qedit_ip1 = findViewById(R.id.qedit_ip1);
-        qedit_ip2 = findViewById(R.id.qedit_ip2);
-        hedit_ip1 = findViewById(R.id.hedit_ip1);
-        hedit_ip2 = findViewById(R.id.hedit_ip2);
 
-        ynbtn_ping = findViewById(R.id.ynbtn_ping);
-        ynedit_ip = findViewById(R.id.ynedit_ip);
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.btn_ping:
-                ip = et_ip.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
+    protected void onResume() {
+        super.onResume();
+        cc++;
+        if (cc>1){
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    SystemClock.sleep(1000*60*60);
+                    List<String> list=new ArrayList<>();
+                    list.add("39.106.143.106");
+                    list.add("59.110.167.178");
+                    list.add("39.108.229.16");
+                    list.add("120.78.64.248");
+                    list.add("120.78.68.95");
+                    list.add("47.104.100.41");
+                    list.add("47.104.131.23");
+                    list.add("106.14.141.68");
+                    list.add("47.100.186.29");
+                    list.add("106.15.207.66");
+                    list.add("39.104.202.19");
+                    list.add("39.104.228.146");
+                    list.add("149.129.242.146");
+                    for (int i = 0; i <list.size() ; i++) {
 
-                String countCmd = " -c " + count + " ";
-                String sizeCmd = " -s " + size + " ";
-                String timeCmd = " -i " + time + " ";
-                String ip_adress = ip;
-                String ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
+                        //ip = et_ip.getText().toString();
+                        count = et_count.getText().toString();
+                        size = et_size.getText().toString();
+                        time = et_time.getText().toString();
 
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                Bundle bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", ip);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.btn_ping2:
-                ip2 = edit_ip2.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
+                        String countCmd = " -c " + count + " ";
+                        String sizeCmd = " -s " + size + " ";
+                        String timeCmd = " -i " + time + " ";
+                        String ip_adress = list.get(i);
+                        String ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
 
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = ip2;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", ip2);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                bundle.putString("query",query);
-                bundle.putString("time", time);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.sbtn_ping1:
-                sip1 = sedit_ip1.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = sip1;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", sip1);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.sbtn_ping2:
-                sip2 = sedit_ip2.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = sip2;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", sip2);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.sbtn_ping3:
-                sip3 = sedit_ip3.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = sip3;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", sip3);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                bundle.putString("time", time);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.shbtn_ping1:
-                ship1 = shedit_ip1.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = ship1;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", ship1);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.shbtn_ping2:
-                ship2 = shedit_ip2.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = ship2;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", ship2);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.shbtn_ping3:
-                ship3 = shedit_ip3.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = ship3;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", ship3);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.qbtn_ping1:
-                qip1 = qedit_ip1.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = qip1;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", qip1);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.qbtn_ping2:
-                qip2 = qedit_ip2.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = qip2;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", qip2);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.hbtn_ping1:
-                hip1 = hedit_ip1.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = hip1;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", hip1);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.hbtn_ping2:
-                hip2 = hedit_ip2.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = hip2;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent = new Intent();
-                intent.setClass(MainActivity.this, PingResult1.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", hip2);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                break;
-            case R.id.ynbtn_ping:
-
-                ynip = ynedit_ip.getText().toString();
-                count = et_count.getText().toString();
-                size = et_size.getText().toString();
-                time = et_time.getText().toString();
-
-                countCmd = " -c " + count + " ";
-                sizeCmd = " -s " + size + " ";
-                timeCmd = " -i " + time + " ";
-                ip_adress = ynip;
-                ping = "ping" + countCmd + timeCmd + sizeCmd + ip_adress;
-
-                intent1 = new Intent();
-                intent1.setClass(MainActivity.this, PingResult2.class);
-                // new一个Bundle对象，并将要传递的数据传入
-                bundle = new Bundle();
-                bundle.putString("ping", ping);
-                bundle.putString("ip", ynip);
-                bundle.putString("count", count);
-                bundle.putString("size", size);
-                bundle.putString("time", time);
-                bundle.putString("query",query);
-                bundle.putString("city",city);
-                bundle.putString("regionName",regionName);
-                bundle.putString("org",org);
-                intent1.putExtras(bundle);
-                startActivity(intent1);
-                break;
-
+                        Intent intent = new Intent();
+                        intent.setClass(MainActivity.this, PingResult1.class);
+                        // new一个Bundle对象，并将要传递的数据传入
+                        Bundle bundle = new Bundle();
+                        bundle.putString("ping", ping);
+                        bundle.putString("ip", list.get(i));
+                        bundle.putString("city",city);
+                        bundle.putString("regionName",regionName);
+                        bundle.putString("org",org);
+                        bundle.putString("count", count);
+                        bundle.putString("size", size);
+                        bundle.putString("time", time);
+                        bundle.putString("query",query);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
+                }
+            }.start();
         }
     }
 }

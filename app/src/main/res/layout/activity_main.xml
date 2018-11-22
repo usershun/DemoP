@@ -11,14 +11,30 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/tv_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="地区IP地址选择"
-        android:textSize="22sp"
-        android:layout_gravity="center_horizontal"
-        />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="地区IP地址"
+                android:textSize="22sp"
+                android:layout_gravity="center"
+                />
+            <TextView
+                android:id="@+id/timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10dp"
+                android:layout_marginLeft="30dp"
+                android:text="距离PING值间隔时间为（1小时）"
+                android:layout_marginTop="10dp"
+                />
+        </LinearLayout>
+
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -36,13 +52,6 @@
             android:layout_height="wrap_content"
              android:text="39.106.143.106"
             />
-        <Button
-            android:id="@+id/btn_ping"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
-
-            android:text="PING" />
     </LinearLayout>
 
     <LinearLayout
@@ -62,12 +71,6 @@
             android:layout_height="wrap_content"
             android:text="59.110.167.178"
             />
-        <Button
-            android:id="@+id/btn_ping2"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
-            android:text="PING" />
     </LinearLayout>
 
     <LinearLayout
@@ -87,12 +90,6 @@
             android:layout_height="wrap_content"
             android:text="39.108.229.16"
             />
-        <Button
-            android:id="@+id/sbtn_ping1"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -111,13 +108,6 @@
             android:layout_height="wrap_content"
             android:text="120.78.64.248"
             />
-        <Button
-            android:id="@+id/sbtn_ping2"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
-
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -136,13 +126,6 @@
             android:layout_height="wrap_content"
             android:text="120.78.68.95"
             />
-        <Button
-            android:id="@+id/sbtn_ping3"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
-
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -161,13 +144,7 @@
             android:layout_height="wrap_content"
             android:text="47.104.100.41"
             />
-        <Button
-            android:id="@+id/qbtn_ping1"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -186,13 +163,7 @@
             android:layout_height="wrap_content"
             android:text="47.104.131.23"
             />
-        <Button
-            android:id="@+id/qbtn_ping2"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -211,13 +182,7 @@
             android:layout_height="wrap_content"
             android:text="106.14.141.68"
             />
-        <Button
-            android:id="@+id/shbtn_ping1"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -236,13 +201,7 @@
             android:layout_height="wrap_content"
             android:text="47.100.186.29"
             />
-        <Button
-            android:id="@+id/shbtn_ping2"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -261,13 +220,7 @@
             android:layout_height="wrap_content"
             android:text="106.15.207.66"
             />
-        <Button
-            android:id="@+id/shbtn_ping3"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -286,13 +239,7 @@
             android:layout_height="wrap_content"
             android:text="39.104.202.19"
             />
-        <Button
-            android:id="@+id/hbtn_ping1"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -311,13 +258,7 @@
             android:layout_height="wrap_content"
             android:text="39.104.228.146"
             />
-        <Button
-            android:id="@+id/hbtn_ping2"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:textSize="10dp"
 
-            android:text="PING" />
     </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
@@ -336,13 +277,6 @@
                 android:layout_height="wrap_content"
                 android:text="149.129.242.146"
                 />
-            <Button
-                android:id="@+id/ynbtn_ping"
-                android:layout_width="50dp"
-                android:layout_height="40dp"
-                android:textSize="10dp"
-
-                android:text="PING" />
         </LinearLayout>
     <TextView
         android:id="@+id/tv_3"
@@ -356,7 +290,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
-        android:text="10" />
+        android:text="2" />
 
     <TextView
         android:id="@+id/tv_4"
